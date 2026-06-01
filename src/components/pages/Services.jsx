@@ -4,10 +4,42 @@ import SectionHeader from '../ui/SectionHeader.jsx'
 import { getDestinations } from '../../db/database.js'
 
 const categories = [
-  { key: 'all', label: 'Toutes', icon: '🌍' },
-  { key: 'aventure', label: 'Aventure', icon: '🏔️' },
-  { key: 'culture', label: 'Culture', icon: '🏛️' },
-  { key: 'detente', label: 'Détente', icon: '🏖️' },
+  {
+    key: 'all',
+    label: 'Toutes',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'aventure',
+    label: 'Aventure',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'culture',
+    label: 'Culture',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'detente',
+    label: 'Détente',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    ),
+  },
 ]
 
 export default function Services() {
@@ -30,9 +62,6 @@ export default function Services() {
       <section className="relative py-20 md:py-28 bg-hero">
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-primary-900/80" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="inline-block px-4 py-2 bg-white/15 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-6 border border-white/20">
-            🌍 Notre Catalogue Complet
-          </span>
           <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl text-white mb-4">
             Nos Destinations
           </h1>
@@ -56,13 +85,13 @@ export default function Services() {
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
-                className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                   activeCategory === cat.key
                     ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/30 scale-105'
                     : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                 }`}
               >
-                <span className="mr-2">{cat.icon}</span>
+                {cat.icon}
                 {cat.label}
               </button>
             ))}
@@ -90,7 +119,9 @@ export default function Services() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <div className="text-6xl mb-4">🔍</div>
+              <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <h3 className="font-display font-bold text-xl text-gray-900 mb-2">
                 Aucune destination trouvée
               </h3>

@@ -11,13 +11,7 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="animate-fade-in-up">
-          <span className="inline-block px-4 py-2 bg-white/15 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-6 border border-white/20">
-            🌍 Plus de 500 destinations dans le monde
-          </span>
-        </div>
-
-        <h1 className="animate-fade-in-up font-display font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-tight mb-6" style={{ animationDelay: '100ms' }}>
+        <h1 className="animate-fade-in-up font-display font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-tight mb-6">
           Explorez le Monde
           <br />
           <span className="text-accent-300">sans Limites</span>

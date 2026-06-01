@@ -29,21 +29,17 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+        scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg transition-colors ${
-              scrolled ? 'bg-primary-600 text-white' : 'bg-white/20 text-white backdrop-blur-sm'
-            }`}>
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-primary-600 text-white flex items-center justify-center font-bold text-lg">
               T
             </div>
-            <span className={`font-display font-bold text-xl transition-colors ${
-              scrolled ? 'text-primary-600' : 'text-white'
-            }`}>
+            <span className="font-display font-bold text-xl text-primary-600">
               TravelWorld
             </span>
           </Link>
@@ -56,29 +52,21 @@ export default function Navbar() {
                 to={link.to}
                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive(link.to)
-                    ? scrolled
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'bg-white/20 text-white'
-                    : scrolled
-                    ? 'text-gray-700 hover:bg-gray-100'
-                    : 'text-white/90 hover:bg-white/10'
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
 
-            <div className="w-px h-6 bg-gray-300/50 mx-2" />
+            <div className="w-px h-6 bg-gray-200 mx-2" />
 
             {user ? (
               <div className="flex items-center gap-2">
                 <Link
                   to="/profil"
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    scrolled
-                      ? 'text-gray-700 hover:bg-gray-100'
-                      : 'text-white/90 hover:bg-white/10'
-                  }`}
+                  className="px-4 py-2 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-all"
                 >
                   <span className="flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,11 +77,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={logout}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    scrolled
-                      ? 'text-red-600 hover:bg-red-50'
-                      : 'text-red-200 hover:bg-white/10'
-                  }`}
+                  className="px-4 py-2 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-all"
                 >
                   Déconnexion
                 </button>
@@ -102,21 +86,13 @@ export default function Navbar() {
               <>
                 <Link
                   to="/connexion"
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    scrolled
-                      ? 'text-gray-700 hover:bg-gray-100'
-                      : 'text-white/90 hover:bg-white/10'
-                  }`}
+                  className="px-4 py-2 rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-all"
                 >
                   Connexion
                 </Link>
                 <Link
                   to="/inscription"
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    scrolled
-                      ? 'btn-primary text-sm py-2'
-                      : 'bg-white text-primary-600 hover:bg-white/90'
-                  }`}
+                  className="btn-primary text-sm py-2 px-4"
                 >
                   Inscription
                 </Link>
@@ -127,9 +103,7 @@ export default function Navbar() {
           {/* Mobile Burger */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`md:hidden p-2 rounded-lg transition-colors ${
-              scrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/10'
-            }`}
+            className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
             aria-label="Toggle menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,34 +122,32 @@ export default function Navbar() {
             isOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0'
           }`}
         >
-          <div className={`rounded-2xl p-4 space-y-1 ${
-            scrolled ? 'bg-white shadow-lg' : 'bg-white/10 backdrop-blur-md'
-          }`}>
+          <div className="rounded-2xl p-4 space-y-1 bg-white shadow-lg border border-gray-100">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 className={`block px-4 py-3 rounded-lg font-medium transition-all ${
                   isActive(link.to)
-                    ? scrolled ? 'bg-primary-50 text-primary-700' : 'bg-white/20 text-white'
-                    : scrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white/90 hover:bg-white/10'
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="border-t border-gray-200/50 my-2" />
+            <div className="border-t border-gray-200 my-2" />
             {user ? (
               <>
                 <Link
                   to="/profil"
-                  className={`block px-4 py-3 rounded-lg font-medium ${scrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white/90 hover:bg-white/10'}`}
+                  className="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-gray-100"
                 >
                   Mon Profil ({user.name})
                 </Link>
                 <button
                   onClick={logout}
-                  className={`w-full text-left block px-4 py-3 rounded-lg font-medium ${scrolled ? 'text-red-600 hover:bg-red-50' : 'text-red-200 hover:bg-white/10'}`}
+                  className="w-full text-left block px-4 py-3 rounded-lg font-medium text-red-600 hover:bg-red-50"
                 >
                   Déconnexion
                 </button>
@@ -184,15 +156,13 @@ export default function Navbar() {
               <>
                 <Link
                   to="/connexion"
-                  className={`block px-4 py-3 rounded-lg font-medium ${scrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white/90 hover:bg-white/10'}`}
+                  className="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-gray-100"
                 >
                   Connexion
                 </Link>
                 <Link
                   to="/inscription"
-                  className={`block px-4 py-3 rounded-lg font-medium text-center ${
-                    scrolled ? 'btn-primary' : 'bg-white text-primary-600'
-                  }`}
+                  className="block px-4 py-3 rounded-lg font-medium text-center btn-primary"
                 >
                   Inscription
                 </Link>

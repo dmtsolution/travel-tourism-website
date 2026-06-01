@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import useScrollReveal from '../../hooks/useScrollReveal.jsx'
 
 const categoryStyles = {
@@ -61,9 +62,9 @@ export default function DestinationCard({ destination, index = 0 }) {
         <p className="text-gray-600 text-sm leading-relaxed mb-4">
           {destination.description}
         </p>
-        <button className="w-full btn-primary text-sm py-2.5">
+        <Link to={`/destination/${destination.slug}`} className="block w-full btn-primary text-sm py-2.5 text-center">
           Voir les détails
-        </button>
+        </Link>
       </div>
     </div>
   )
