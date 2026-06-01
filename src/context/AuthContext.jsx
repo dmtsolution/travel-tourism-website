@@ -21,19 +21,34 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    initializeDB()
-    const stored = localStorage.getItem('travel_current_user')
-    if (stored) {
+    let cancelled = false
+
+    async function init() {
       try {
-        const parsed = JSON.parse(stored)
-        const fresh = getUserById(parsed.id)
-        if (fresh) setUser(fresh)
-        else localStorage.removeItem('travel_current_user')
+        await initializeDB()
+      } catch (e) {
+        console.warn('DB init failed:', e)
+      }
+
+      if (cancelled) return
+
+      try {
+        const stored = localStorage.getItem('travel_current_user')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          const fresh = getUserById(parsed.id)
+          if (fresh) setUser(fresh)
+          else localStorage.removeItem('travel_current_user')
+        }
       } catch {
         localStorage.removeItem('travel_current_user')
       }
+
+      if (!cancelled) setLoading(false)
     }
-    setLoading(false)
+
+    init()
+    return () => { cancelled = true }
   }, [])
 
   const login = (email, password) => {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 
-// Mock reservation history
 const mockReservations = [
   {
     id: 1,
@@ -33,11 +32,12 @@ const mockReservations = [
   },
 ]
 
-const statusColors = {
-  'confirmée': 'bg-green-100 text-green-700',
-  'en attente': 'bg-yellow-100 text-yellow-700',
-  'terminée': 'bg-gray-100 text-gray-600',
-  'annulée': 'bg-red-100 text-red-700',
+function getStatusClass(status) {
+  if (status === 'confirmée') return 'bg-green-100 text-green-700'
+  if (status === 'en attente') return 'bg-yellow-100 text-yellow-700'
+  if (status === 'terminée') return 'bg-gray-100 text-gray-600'
+  if (status === 'annulée') return 'bg-red-100 text-red-700'
+  return 'bg-gray-100 text-gray-600'
 }
 
 export default function Profile() {
@@ -54,7 +54,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full" />
       </div>
     )
@@ -82,23 +82,16 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] bg-gray-50 py-8 md:py-12">
+    <div className="min-h-screen bg-gray-50 py-8 md:py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display font-bold text-3xl md:text-4xl text-gray-900">
-            Mon Profil
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Gérez vos informations personnelles et consultez vos réservations.
-          </p>
+          <h1 className="font-display font-bold text-3xl md:text-4xl text-gray-900">Mon Profil</h1>
+          <p className="text-gray-600 mt-2">Gérez vos informations personnelles et consultez vos réservations.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Card */}
           <div className="lg:col-span-1 space-y-6">
             <div className="card p-6 text-center">
-              {/* Avatar */}
               <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-3xl font-display font-bold shadow-lg">
                 {user.name.charAt(0).toUpperCase()}
               </div>
@@ -109,7 +102,6 @@ export default function Profile() {
               </span>
             </div>
 
-            {/* Quick Stats */}
             <div className="card p-6">
               <h3 className="font-display font-semibold text-gray-900 mb-4">Statistiques</h3>
               <div className="space-y-3">
@@ -132,7 +124,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Quick Links */}
             <div className="card p-4 space-y-2">
               <Link to="/services" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,17 +140,12 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Edit Profile */}
             <div className="card p-8">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-display font-bold text-xl text-gray-900">Informations personnelles</h3>
                 {!editing && (
-                  <button
-                    onClick={() => setEditing(true)}
-                    className="text-primary-600 hover:text-primary-700 font-medium text-sm flex items-center gap-1"
-                  >
+                  <button onClick={() => setEditing(true)} className="text-primary-600 hover:text-primary-700 font-medium text-sm flex items-center gap-1">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
@@ -173,7 +159,7 @@ export default function Profile() {
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Profil mis à jour avec succès !
+                  Profil mis à jour !
                 </div>
               )}
 
@@ -181,13 +167,7 @@ export default function Profile() {
                 <div>
                   <label className="label">Nom complet</label>
                   {editing ? (
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      className="input-field"
-                    />
+                    <input type="text" name="name" value={form.name} onChange={handleChange} className="input-field" />
                   ) : (
                     <p className="text-gray-900 font-medium">{user.name}</p>
                   )}
@@ -195,78 +175,39 @@ export default function Profile() {
                 <div>
                   <label className="label">Adresse email</label>
                   {editing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      className="input-field"
-                    />
+                    <input type="email" name="email" value={form.email} onChange={handleChange} className="input-field" />
                   ) : (
                     <p className="text-gray-900 font-medium">{user.email}</p>
                   )}
                 </div>
-
                 {editing && (
                   <div className="flex gap-3 pt-2">
-                    <button onClick={handleSave} className="btn-primary px-6 py-2.5">
-                      Enregistrer
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditing(false)
-                        setForm({ name: user.name, email: user.email })
-                      }}
-                      className="btn-secondary px-6 py-2.5"
-                    >
-                      Annuler
-                    </button>
+                    <button onClick={handleSave} className="btn-primary px-6 py-2.5">Enregistrer</button>
+                    <button onClick={() => { setEditing(false); setForm({ name: user.name, email: user.email }); }} className="btn-secondary px-6 py-2.5">Annuler</button>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Reservations */}
             <div className="card p-8">
-              <h3 className="font-display font-bold text-xl text-gray-900 mb-6">
-                Historique des réservations
-              </h3>
-
-              {mockReservations.length > 0 ? (
-                <div className="space-y-4">
-                  {mockReservations.map((res) => (
-                    <div
-                      key={res.id}
-                      className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <img
-                        src={res.image}
-                        alt={res.destination}
-                        className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 truncate">{res.destination}</h4>
-                        <p className="text-sm text-gray-500">{res.country} • {new Date(res.date).toLocaleDateString('fr-FR')}</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-gray-900">{res.price}€</p>
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[res.status]}`}>
-                          {res.status}
-                        </span>
-                      </div>
+              <h3 className="font-display font-bold text-xl text-gray-900 mb-6">Historique des réservations</h3>
+              <div className="space-y-4">
+                {mockReservations.map((res) => (
+                  <div key={res.id} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <img src={res.image} alt={res.destination} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-gray-900 truncate">{res.destination}</h4>
+                      <p className="text-sm text-gray-500">{res.country} • {new Date(res.date).toLocaleDateString('fr-FR')}</p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <div className="text-5xl mb-4">✈️</div>
-                  <p className="font-medium">Aucune réservation pour le moment</p>
-                  <p className="text-sm mt-1">Explorez nos destinations et réservez votre premier voyage !</p>
-                  <Link to="/services" className="btn-primary mt-4 inline-flex">
-                    Voir les destinations
-                  </Link>
-                </div>
-              )}
+                    <div className="text-right flex-shrink-0">
+                      <p className="font-bold text-gray-900">{res.price}€</p>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusClass(res.status)}`}>
+                        {res.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
