@@ -1,12 +1,12 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { hashPassword, verifyPassword } from '../utils/hashPassword.js'
+import { hashPassword, verifyPassword } from '../utils/hashPassword.jsx'
 import {
   initializeDB,
   getUserByEmail,
   createUser as dbCreateUser,
   getUserById,
   updateUser as dbUpdateUser,
-} from '../db/database.js'
+} from '../db/database.jsx'
 
 const AuthContext = createContext(null)
 
@@ -22,16 +22,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let cancelled = false
-
     async function init() {
-      try {
-        await initializeDB()
-      } catch (e) {
-        console.warn('DB init failed:', e)
-      }
-
+      try { await initializeDB() } catch (e) { console.warn('DB init failed:', e) }
       if (cancelled) return
-
       try {
         const stored = localStorage.getItem('travel_current_user')
         if (stored) {
@@ -40,13 +33,9 @@ export function AuthProvider({ children }) {
           if (fresh) setUser(fresh)
           else localStorage.removeItem('travel_current_user')
         }
-      } catch {
-        localStorage.removeItem('travel_current_user')
-      }
-
+      } catch { localStorage.removeItem('travel_current_user') }
       if (!cancelled) setLoading(false)
     }
-
     init()
     return () => { cancelled = true }
   }, [])
@@ -63,27 +52,19 @@ export function AuthProvider({ children }) {
 
   const register = (name, email, password) => {
     const existing = getUserByEmail(email.trim().toLowerCase())
-    if (existing) throw new Error('Un compte avec cet email existe déjà')
+    if (existing) throw new Error('Un compte avec cet email existe deja')
     const hashed = hashPassword(password)
-    const newUser = dbCreateUser({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      password: hashed,
-      role: 'client',
-    })
+    const newUser = dbCreateUser({ name: name.trim(), email: email.trim().toLowerCase(), password: hashed, role: 'client' })
     const { password: _, ...safe } = newUser
     setUser(safe)
     localStorage.setItem('travel_current_user', JSON.stringify(safe))
     return safe
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('travel_current_user')
-  }
+  const logout = () => { setUser(null); localStorage.removeItem('travel_current_user') }
 
   const updateProfile = (data) => {
-    if (!user) throw new Error('Non connecté')
+    if (!user) throw new Error('Non connecte')
     const updated = dbUpdateUser(user.id, data)
     const { password: _, ...safe } = updated
     setUser(safe)

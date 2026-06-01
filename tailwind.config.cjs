@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts}",
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   safelist: [
     'bg-green-100', 'text-green-700',
