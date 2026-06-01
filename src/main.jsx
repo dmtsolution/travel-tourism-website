@@ -1,3 +1,8 @@
+// Purge localStorage for clean testing
+localStorage.removeItem('travel_users')
+localStorage.removeItem('travel_reservations')
+localStorage.removeItem('travel_current_user')
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
