@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts}",
   ],
   safelist: [
     'bg-green-100', 'text-green-700',
@@ -12,6 +12,7 @@ module.exports = {
     'bg-yellow-100', 'text-yellow-700',
     'bg-red-100', 'text-red-700',
     'bg-primary-50', 'text-primary-700',
+    'line-clamp-3', 'line-clamp-4',
   ],
   theme: {
     extend: {

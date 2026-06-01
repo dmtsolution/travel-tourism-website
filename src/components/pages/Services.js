@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import DestinationCard from '../ui/DestinationCard.jsx'
 import SectionHeader from '../ui/SectionHeader.jsx'
-import { getDestinations } from '../../db/database.js'
+import { getDestinations, initializeDB } from '../../db/database.js'
 
 const categories = [
   {
@@ -49,8 +49,12 @@ export default function Services() {
 
   useEffect(() => {
     setLoading(true)
-    const timer = setTimeout(() => {
-      setDestinations(getDestinations(activeCategory))
+    const timer = setTimeout(async () => {
+      await initializeDB()
+      const dests = getDestinations(activeCategory)
+      console.log('DESTINATIONS:', dests)
+      console.log('FIRST SLUG:', dests[0]?.slug)
+      setDestinations(dests)
       setLoading(false)
     }, 300)
     return () => clearTimeout(timer)

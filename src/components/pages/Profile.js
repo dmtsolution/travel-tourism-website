@@ -1,36 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext.jsx'
-
-const mockReservations = [
-  {
-    id: 1,
-    destination: 'Safari au Kenya',
-    country: 'Kenya',
-    date: '2025-03-15',
-    status: 'confirmée',
-    price: 2499,
-    image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=200&q=80',
-  },
-  {
-    id: 2,
-    destination: 'Paris Romantique',
-    country: 'France',
-    date: '2025-06-20',
-    status: 'en attente',
-    price: 599,
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=200&q=80',
-  },
-  {
-    id: 3,
-    destination: 'Plages de Thaïlande',
-    country: 'Thaïlande',
-    date: '2024-12-10',
-    status: 'terminée',
-    price: 1899,
-    image: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=200&q=80',
-  },
-]
+import { useAuth } from '../../context/AuthContext.js'
+import { getUserReservations, cancelReservation } from '../../db/reservations.js'
 
 function getStatusClass(status) {
   if (status === 'confirmée') return 'bg-green-100 text-green-700'
@@ -45,10 +16,12 @@ export default function Profile() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ name: '', email: '' })
   const [updateSuccess, setUpdateSuccess] = useState(false)
+  const [reservations, setReservations] = useState([])
 
   useEffect(() => {
     if (user) {
       setForm({ name: user.name, email: user.email })
+      setReservations(getUserReservations(user.id))
     }
   }, [user])
 
@@ -81,6 +54,16 @@ export default function Profile() {
     }
   }
 
+  const handleCancel = (reservationId) => {
+    if (confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+      cancelReservation(user.id, reservationId)
+      setReservations(getUserReservations(user.id))
+    }
+  }
+
+  const totalSpent = reservations.reduce((sum, r) => sum + r.price, 0)
+  const completedCount = reservations.filter((r) => r.status === 'terminée').length
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 md:py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,6 +73,7 @@ export default function Profile() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             <div className="card p-6 text-center">
               <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-3xl font-display font-bold shadow-lg">
@@ -107,19 +91,15 @@ export default function Profile() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600 text-sm">Réservations</span>
-                  <span className="font-semibold text-gray-900">{mockReservations.length}</span>
+                  <span className="font-semibold text-gray-900">{reservations.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 text-sm">Voyages terminés</span>
-                  <span className="font-semibold text-gray-900">
-                    {mockReservations.filter((r) => r.status === 'terminée').length}
-                  </span>
+                  <span className="font-semibold text-gray-900">{completedCount}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 text-sm">Total dépensé</span>
-                  <span className="font-semibold text-primary-600">
-                    {mockReservations.reduce((sum, r) => sum + r.price, 0)}€
-                  </span>
+                  <span className="font-semibold text-primary-600">{totalSpent}€</span>
                 </div>
               </div>
             </div>
@@ -127,20 +107,22 @@ export default function Profile() {
             <div className="card p-4 space-y-2">
               <Link to="/services" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Explorer les destinations
               </Link>
               <Link to="/contact" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 Nous contacter
               </Link>
             </div>
           </div>
 
+          {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Edit Profile */}
             <div className="card p-8">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-display font-bold text-xl text-gray-900">Informations personnelles</h3>
@@ -189,25 +171,50 @@ export default function Profile() {
               </div>
             </div>
 
+            {/* Reservations */}
             <div className="card p-8">
-              <h3 className="font-display font-bold text-xl text-gray-900 mb-6">Historique des réservations</h3>
-              <div className="space-y-4">
-                {mockReservations.map((res) => (
-                  <div key={res.id} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <img src={res.image} alt={res.destination} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-900 truncate">{res.destination}</h4>
-                      <p className="text-sm text-gray-500">{res.country} • {new Date(res.date).toLocaleDateString('fr-FR')}</p>
+              <h3 className="font-display font-bold text-xl text-gray-900 mb-6">Mes réservations</h3>
+
+              {reservations.length > 0 ? (
+                <div className="space-y-4">
+                  {reservations.map((res) => (
+                    <div key={res.id} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                      <img src={res.image} alt={res.destination} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-gray-900 truncate">{res.destination}</h4>
+                        <p className="text-sm text-gray-500">{res.country} • {res.duration} jours</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Réservé le {new Date(res.bookedAt).toLocaleDateString('fr-FR')}
+                          {res.departureDate && ` • Départ: ${new Date(res.departureDate).toLocaleDateString('fr-FR')}`}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-gray-900">{res.price}€</p>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusClass(res.status)}`}>
+                          {res.status}
+                        </span>
+                        {res.status === 'confirmée' && (
+                          <button
+                            onClick={() => handleCancel(res.id)}
+                            className="block mt-2 text-xs text-red-500 hover:text-red-700 transition-colors"
+                          >
+                            Annuler
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="font-bold text-gray-900">{res.price}€</p>
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusClass(res.status)}`}>
-                        {res.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="font-medium">Aucune réservation pour le moment</p>
+                  <p className="text-sm mt-1">Explorez nos destinations et réservez votre premier voyage !</p>
+                  <Link to="/services" className="btn-primary mt-4 inline-flex">Voir les destinations</Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

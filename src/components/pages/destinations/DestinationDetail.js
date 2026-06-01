@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
+import { useAuth } from '../../../context/AuthContext.js'
 import { getDestinationBySlug } from '../../../db/database.js'
+import { bookDestination, isAlreadyBooked } from '../../../db/reservations.js'
 
 const categoryLabels = { aventure: 'Aventure', culture: 'Culture', detente: 'Détente' }
 
@@ -22,35 +24,50 @@ const itinerary = [
 
 export default function DestinationDetail() {
   const { slug } = useParams()
+  const { user } = useAuth()
   const [destination, setDestination] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [showBooking, setShowBooking] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
+  const [alreadyBooked, setAlreadyBooked] = useState(false)
 
   useEffect(() => {
     const dest = getDestinationBySlug(slug)
-    setDestination(dest)
+    setDestination(dest || { notFound: true })
+    if (dest && user) {
+      setAlreadyBooked(isAlreadyBooked(user.id, dest.id))
+    }
     window.scrollTo(0, 0)
-  }, [slug])
+  }, [slug, user])
 
-  if (destination === null) return <Navigate to="/services" replace />
+  if (destination?.notFound) return <Navigate to="/services" replace />
   if (!destination) return null
 
   const handleBooking = (e) => {
     e.preventDefault()
-    setBookingSuccess(true)
-    setTimeout(() => setShowBooking(false), 2000)
+    if (!user) {
+      window.location.href = '/connexion'
+      return
+    }
+    const formData = new FormData(e.target)
+    const reservation = bookDestination(user.id, destination, {
+      departureDate: formData.get('departureDate'),
+      travelers: formData.get('travelers'),
+      travelerName: formData.get('travelerName'),
+      travelerEmail: formData.get('travelerEmail'),
+    })
+    if (reservation) {
+      setBookingSuccess(true)
+      setAlreadyBooked(true)
+      setTimeout(() => setShowBooking(false), 2500)
+    }
   }
 
   return (
     <div>
       {/* Hero Image */}
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
-        <img
-          src={destination.image}
-          alt={destination.title}
-          className="w-full h-full object-cover"
-        />
+        <img src={destination.image} alt={destination.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
           <div className="max-w-7xl mx-auto">
@@ -71,14 +88,11 @@ export default function DestinationDetail() {
                 <span className="text-sm font-medium">{destination.rating}</span>
               </div>
             </div>
-            <h1 className="font-display font-bold text-3xl md:text-5xl text-white mb-2">
-              {destination.title}
-            </h1>
+            <h1 className="font-display font-bold text-3xl md:text-5xl text-white mb-2">{destination.title}</h1>
             <div className="flex items-center gap-4 text-white/80 text-sm">
               <span className="flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 {destination.city}, {destination.country}
               </span>
@@ -120,7 +134,6 @@ export default function DestinationDetail() {
                 ))}
               </div>
 
-              {/* Overview */}
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   <div>
@@ -146,7 +159,6 @@ export default function DestinationDetail() {
                 </div>
               )}
 
-              {/* Itinerary */}
               {activeTab === 'itinerary' && (
                 <div>
                   <h2 className="font-display font-bold text-2xl text-gray-900 mb-6">Itinéraire détaillé</h2>
@@ -154,9 +166,7 @@ export default function DestinationDetail() {
                     {itinerary.map((item, i) => (
                       <div key={i} className="flex gap-4">
                         <div className="flex flex-col items-center">
-                          <div className="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-                            {i + 1}
-                          </div>
+                          <div className="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">{i + 1}</div>
                           {i < itinerary.length - 1 && <div className="w-0.5 flex-1 bg-primary-200 mt-2" />}
                         </div>
                         <div className="pb-6">
@@ -170,7 +180,6 @@ export default function DestinationDetail() {
                 </div>
               )}
 
-              {/* Inclusions */}
               {activeTab === 'inclusions' && (
                 <div>
                   <h2 className="font-display font-bold text-2xl text-gray-900 mb-6">Ce qui est inclus</h2>
@@ -232,18 +241,26 @@ export default function DestinationDetail() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setShowBooking(true)}
-                  className="btn-primary w-full py-3.5 text-lg"
-                >
-                  Réserver maintenant
-                </button>
+                {/* Booking Button */}
+                {alreadyBooked ? (
+                  <div className="w-full py-3.5 rounded-xl bg-green-50 border border-green-200 text-green-700 font-semibold text-center flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Déjà réservé
+                  </div>
+                ) : user ? (
+                  <button onClick={() => setShowBooking(true)} className="btn-primary w-full py-3.5 text-lg">
+                    Réserver maintenant
+                  </button>
+                ) : (
+                  <Link to="/connexion" className="block w-full btn-primary py-3.5 text-lg text-center">
+                    Se connecter pour réserver
+                  </Link>
+                )}
 
-                <p className="text-center text-xs text-gray-400 mt-3">
-                  Annulation gratuite jusqu'à 48h avant le départ
-                </p>
+                <p className="text-center text-xs text-gray-400 mt-3">Annulation gratuite jusqu'à 48h avant le départ</p>
 
-                {/* Trust badges */}
                 <div className="mt-6 pt-6 border-t border-gray-100 flex items-center justify-center gap-4">
                   <div className="flex items-center gap-1 text-xs text-gray-400">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,7 +302,10 @@ export default function DestinationDetail() {
                   </svg>
                 </div>
                 <h3 className="font-display font-bold text-xl text-gray-900 mb-2">Réservation confirmée !</h3>
-                <p className="text-gray-600 text-sm">Vous recevrez un email de confirmation sous peu.</p>
+                <p className="text-gray-600 text-sm mb-4">Votre réservation a été enregistrée avec succès.</p>
+                <Link to="/profil" className="btn-primary inline-flex px-6 py-2.5">
+                  Voir mes réservations
+                </Link>
               </div>
             ) : (
               <>
@@ -294,24 +314,24 @@ export default function DestinationDetail() {
                 <form onSubmit={handleBooking} className="space-y-4">
                   <div>
                     <label className="label">Nom complet</label>
-                    <input type="text" required placeholder="Jean Dupont" className="input-field" />
+                    <input type="text" name="travelerName" required placeholder="Jean Dupont" className="input-field" defaultValue={user?.name || ''} />
                   </div>
                   <div>
                     <label className="label">Email</label>
-                    <input type="email" required placeholder="votre@email.com" className="input-field" />
+                    <input type="email" name="travelerEmail" required placeholder="votre@email.com" className="input-field" defaultValue={user?.email || ''} />
                   </div>
                   <div>
                     <label className="label">Date de départ souhaitée</label>
-                    <input type="date" required className="input-field" />
+                    <input type="date" name="departureDate" required className="input-field" />
                   </div>
                   <div>
                     <label className="label">Nombre de voyageurs</label>
-                    <select className="input-field">
-                      <option>1 personne</option>
-                      <option>2 personnes</option>
-                      <option>3 personnes</option>
-                      <option>4 personnes</option>
-                      <option>5+ personnes</option>
+                    <select name="travelers" className="input-field">
+                      <option value="1">1 personne</option>
+                      <option value="2">2 personnes</option>
+                      <option value="3">3 personnes</option>
+                      <option value="4">4 personnes</option>
+                      <option value="5">5+ personnes</option>
                     </select>
                   </div>
                   <div className="pt-2 border-t border-gray-100">

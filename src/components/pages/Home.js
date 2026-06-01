@@ -4,7 +4,7 @@ import HeroSection from '../ui/HeroSection.jsx'
 import SectionHeader from '../ui/SectionHeader.jsx'
 import DestinationCard from '../ui/DestinationCard.jsx'
 import ServiceCard from '../ui/ServiceCard.jsx'
-import { getFeaturedDestinations } from '../../db/database.js'
+import { getFeaturedDestinations, initializeDB } from '../../db/database.js'
 
 const services = [
   {
@@ -59,7 +59,14 @@ export default function Home() {
   const [destinations, setDestinations] = useState([])
 
   useEffect(() => {
-    setDestinations(getFeaturedDestinations())
+    async function load() {
+      await initializeDB()
+      const dests = getFeaturedDestinations()
+      console.log('HOME DESTINATIONS:', dests)
+      console.log('HOME FIRST SLUG:', dests[0]?.slug)
+      setDestinations(dests)
+    }
+    load()
   }, [])
 
   return (

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext.js'
+import { isAlreadyBooked } from '../../db/reservations.js'
 import useScrollReveal from '../../hooks/useScrollReveal.jsx'
 
 const categoryStyles = {
@@ -16,7 +18,9 @@ function getCategoryStyle(category) {
 
 export default function DestinationCard({ destination, index = 0 }) {
   const [ref, isVisible] = useScrollReveal(0.1)
+  const { user } = useAuth()
   const cat = getCategoryStyle(destination.category)
+  const alreadyBooked = user ? isAlreadyBooked(user.id, destination.id) : false
 
   return (
     <div
@@ -56,15 +60,27 @@ export default function DestinationCard({ destination, index = 0 }) {
           <span className="mx-1">•</span>
           <span>{destination.duration} jours</span>
         </div>
-        <h3 className="font-display font-bold text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+        <h3 className="font-display font-bold text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
           {destination.title}
         </h3>
-        <p className="text-gray-600 text-sm leading-relaxed mb-4">
+        <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
           {destination.description}
         </p>
-        <Link to={`/destination/${destination.slug}`} className="block w-full btn-primary text-sm py-2.5 text-center">
-          Voir les détails
-        </Link>
+        {alreadyBooked ? (
+          <div className="w-full py-2.5 rounded-xl bg-green-50 border border-green-200 text-green-700 font-semibold text-sm text-center flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Déjà réservé
+          </div>
+        ) : (
+          <Link
+            to={`/destination/${destination.slug || destination.id}`}
+            className="block w-full btn-primary text-sm py-2.5 text-center"
+          >
+            Voir les détails
+          </Link>
+        )}
       </div>
     </div>
   )
